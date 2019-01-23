@@ -4,12 +4,12 @@
 An automated quality control service that will help data science and engineering can work together more closely, reducing time spent fixing bugs and manually QAing new data features.  This will be used with Segment (event data service).  It could be used for other data sources as well.
 
 ## Tech Stack
-Segment https://segment.com/docs/spec/
-Amazon Kinesis
-Lambda *(to be confirmed)*
-S3
-Webhook
-Airflow
+Segment https://segment.com/docs/spec/  
+Amazon Kinesis  
+Lambda   
+S3  
+Webhook  
+Airflow  
 
 ## Data Source
 Mason Finance sample json file and json schema
