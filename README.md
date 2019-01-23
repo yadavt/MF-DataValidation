@@ -21,15 +21,18 @@ To build a resilient and fault tolerant system that is realtime as well as can h
 It directly impacts Mason Finance developer productivity by removing the need to manually QA the JSON being produced by the website events.
 
 ## MVP
-Webhook created from API-Gateway and Lambda, expecting data from Segment
-https://api.slack.com/tutorials/aws-lambda
-Ingests JSON and checks against JSON schema in DynamoDB database
+* Webhook created from API-Gateway and Lambda, expecting data from Segment  
+* https://api.slack.com/tutorials/aws-lambda
+Ingests JSON and checks against JSON schema in DynamoDB database  
 https://www.tutorialspoint.com/json/json_schema.htm
-Saves errors in the test_errors s3 bucket
-Saves successes in the test_sucess s3 bucket
-File names are the <event_name>_<timestamp>.json
-Files are Gzipped
-Webhook returns error for malformed data
+* Saves errors in the test_errors s3 bucket
+* Saves successes in the test_sucess s3 bucket
+* File names are the <event_name><timestamp>.json  
+* Files are Gzipped
+* Webhook returns error for malformed data
+
+## Potential Architecture
+![Architecture](Arch.png)
 
 ## Stretch Goals
 Provide a solution that does validation of various other data types apart from JSON.
