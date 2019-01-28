@@ -2,6 +2,8 @@ from __future__ import print_function
 import base64
 import random
 import json
+import boto3
+import time
 from botocore.vendored import requests
 
 def lambda_handler(event, context):
@@ -25,3 +27,10 @@ def lambda_handler(event, context):
         'Request to slack returned an error %s, the response is:\n%s'
         % (response.status_code, response.text)
             )
+
+    # Write the payload to s3
+    encoded_string=str(payload).encode("utf-8")
+    s3_path=time.strftime("%Y%m%d-%H%M%S")
+
+    s3 = boto3.resource("s3")
+    s3.Bucket("mf-json-validation-errors").put_object(Key=s3_path, Body=encoded_string)
