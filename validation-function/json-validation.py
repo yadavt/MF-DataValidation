@@ -17,11 +17,18 @@ def lambda_handler(event, context):
     dynamodb=boto3.resource("dynamodb")
     table=dynamodb.Table("JSON_Schemas")
 
-    responsedb= table.get_item(
-        Key={
-            "Property" :payload["properties"]["name"]
-        }
-    )
+    if not payload["name"]:
+        responsedb= table.get_item(
+            Key={
+                "Property" :"Default"
+            }
+        )
+    else:
+        responsedb= table.get_item(
+            Key={
+                "Property" :payload["name"]
+            }
+        )
     item= responsedb["Item"]
     schema=item["Schema"]
     schema=json.loads(schema)
@@ -29,8 +36,18 @@ def lambda_handler(event, context):
     v=Draft3Validator(schema)
     errors = sorted(v.iter_errors(payload), key=lambda e: e.path)
 
-    for error in errors:
-        print("Value incorrect at key " + error.path[0] + ". " +error.message)
+    if errors:
+        # Write the payload to s3
+        errorStr=""
+        for error in errors:
+            errorStr=errorStr+("Value incorrect at key " + error.path[0] + ". " +error.message +"\n")
+
+        encoded_string=(errorStr+str(payload)).encode("utf-8")
+        print(encoded_string)
+        s3_path=time.strftime("%Y%m%d-"+"-"+payload["messageId"])
+        s3 = boto3.resource("s3")
+        s3.Bucket("mf-json-validation-errors").put_object(Key=s3_path, Body=encoded_string)
+
 
     # Set the webhook_url to the one provided by Slack
     # webhook_url = 'https://hooks.slack.com/services/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'
@@ -46,9 +63,3 @@ def lambda_handler(event, context):
     #     'Request to slack returned an error %s, the response is:\n%s'
     #     % (response.status_code, response.text)
     #         )
-
-    # Write the payload to s3
-    # encoded_string=str(payload).encode("utf-8")
-    # s3_path=time.strftime("%Y%m%d-%H%M%S")
-    # s3 = boto3.resource("s3")
-    # s3.Bucket("mf-json-validation-errors").put_object(Key=s3_path, Body=encoded_string)
