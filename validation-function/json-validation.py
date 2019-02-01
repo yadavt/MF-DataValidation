@@ -17,18 +17,35 @@ def lambda_handler(event, context):
     dynamodb=boto3.resource("dynamodb")
     table=dynamodb.Table("JSON_Schemas")
 
-    if not payload["name"]:
-        responsedb= table.get_item(
-            Key={
-                "Property" :"Default"
-            }
-        )
-    else:
-        responsedb= table.get_item(
-            Key={
-                "Property" :payload["name"]
-            }
-        )
+    try:
+        if not payload["name"]:
+            responsedb= table.get_item(
+                Key={
+                    "Property" :"Default"
+                }
+            )
+
+        elif payload["name"]:
+            responsedb= table.get_item(
+                Key={
+                    "Property" :payload["name"]
+                }
+            )
+    except(KeyError):
+        try:
+            if payload["event"]:
+                responsedb= table.get_item(
+                    Key={
+                        "Property" :"Default"
+                    }
+                )
+        except(KeyError):
+                responsedb= table.get_item(
+                    Key={
+                        "Property" :"Default"
+                    }
+                )
+
     item= responsedb["Item"]
     schema=item["Schema"]
     schema=json.loads(schema)
