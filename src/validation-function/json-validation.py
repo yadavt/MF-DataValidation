@@ -43,10 +43,15 @@ def lambda_handler(event, context):
         print("Cannot find the schema since property is missing. " + str(KeyError))
 
 def getSchema(keyValue):
+    #Assign default if empty
+    if keyValue=="":
+        keyValue="Default"
+    
     #Read from dynamo db that contains schemas
     dynamodb=boto3.resource("dynamodb")
     table=dynamodb.Table("JSON_Schemas")
 
+    //Send exception back to slack and s3
     responsedb= table.get_item(
         Key={"Property" :keyValue}
         )
