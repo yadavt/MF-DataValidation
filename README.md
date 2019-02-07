@@ -36,3 +36,6 @@ https://www.tutorialspoint.com/json/json_schema.htm
 
 ## Stretch Goals
 Provide a solution that does validation of various other data types apart from JSON.
+
+## Demo
+![Alt Text](/images/demo.gif)
