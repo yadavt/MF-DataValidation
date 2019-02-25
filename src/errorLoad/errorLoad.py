@@ -18,7 +18,7 @@ def lambda_handler(event, context):
 
     # Get the S3 files
     s3 = boto3.resource("s3")
-    myBucket = s3.Bucket("mf-json-validation-errors")
+    myBucket = s3.Bucket(os.environ['S3_BUCKET'])
 
     # Set the date so that previous day files are extracted
     dayBefore = datetime.date.today() - timedelta(days=1)

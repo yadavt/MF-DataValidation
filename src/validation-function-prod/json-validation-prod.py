@@ -13,12 +13,12 @@ def lambda_handler(event, context):
 
        # Kinesis data is base64 encoded so decode here
         payload = base64.b64decode(record["kinesis"]["data"])
-        print("Decoded payload: " + str(payload))
+        # print("Decoded payload: " + str(payload))
         payload = json.loads(payload)
 
     try:
         typeEvent = payload["type"]
-        print(typeEvent)
+        # print(typeEvent)
         schema = {}
         if typeEvent == "page":
             schema = getSchema(payload["name"])
@@ -34,7 +34,7 @@ def lambda_handler(event, context):
                 errorStr = errorStr + \
                     ("Value incorrect at key " +
                      error.path[0] + ". " + error.message + "\n")
-            print(errorStr)
+            # print(errorStr)
 
             # publish error data to s3
             s3_path = publishS3(errorStr, payload)
@@ -73,10 +73,10 @@ def postSlack(errorStr, payload, s3_path):
 
     # Reconstruct message to include the s3 location
     errorStr = "Error in Message ID " + payload["messageId"] + "\n" + errorStr + "\n" + \
-        "You can find the details here: https://s3-us-west-2.amazonaws.com/mf-json-validation-errors/" + s3_path
+        "You can find the details here: https://s3-us-west-2.amazonaws.com/"+ os.environ['S3_BUCKET'] + "/" + s3_path
 
     # Set the webhook_url to the one provided by Slack
-    webhook_url = 'https://hooks.slack.com/services/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'
+    webhook_url = os.environ['WEBHOOK_URL']
     slack_data = {'text': str(errorStr)}
 
     response = requests.post(
@@ -95,9 +95,9 @@ def publishS3(errorStr, payload):
 
     # Write the payload to s3
     encoded_string = (errorStr + str(payload)).encode("utf-8")
-    print(encoded_string)
+    # print(encoded_string)
     s3_path = time.strftime("%Y%m%d-" + payload["messageId"])
     s3 = boto3.resource("s3")
-    s3.Bucket("mf-json-validation-errors").put_object(Key=s3_path,
+    s3.Bucket(os.environ['S3_BUCKET']).put_object(Key=s3_path,
                                                       Body=encoded_string)
     return s3_path
